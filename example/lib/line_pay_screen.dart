@@ -31,7 +31,6 @@ class _LinePayScreenState extends State<LinePayScreen> {
             textAlign: TextAlign.center,
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () {
                 Tappayflutterplugin.setupTappay(
@@ -46,7 +45,6 @@ class _LinePayScreenState extends State<LinePayScreen> {
             ),
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () async {
                 var isLinePayAvailable =
@@ -57,7 +55,6 @@ class _LinePayScreenState extends State<LinePayScreen> {
             ),
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () async {
                 var prime = await Tappayflutterplugin.getLinePayPrime();

@@ -37,7 +37,6 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
             textAlign: TextAlign.center,
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () {
                 Tappayflutterplugin.setupTappay(
@@ -52,7 +51,6 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
             ),
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () async {
                 bool isPrepared = await Tappayflutterplugin.preparePaymentData(
@@ -76,7 +74,6 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
             ),
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () async {
                 await Tappayflutterplugin.requestPaymentData(
@@ -96,7 +93,6 @@ class _GooglePayScreenState extends State<GooglePayScreen> {
             ),
           ),
           Container(
-            color: Colors.blue,
             child: TextButton(
               onPressed: () async {
                 await Tappayflutterplugin.getGooglePayPrime(
