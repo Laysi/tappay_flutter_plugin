@@ -40,7 +40,7 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 Tappayflutterplugin.setupTappay(
                     appId: appId,
@@ -71,7 +71,7 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () async {
                 var isCardValid = await Tappayflutterplugin.isCardValid(
                   cardNumber: cardNumber,
@@ -86,7 +86,7 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
           ),
           Container(
             color: Colors.blue,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () async {
                 PrimeModel prime = await Tappayflutterplugin.getPrime(
                   cardNumber: cardNumber,
