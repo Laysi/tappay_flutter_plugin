@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.user_target_xcconfig= {'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'}
   s.swift_version = '5.0'
-  s.vendored_frameworks = 'TPDirect.framework', 'WebKit.framework', 'SafariServices.framework'
+  s.vendored_frameworks = 'TPDirect.xcframework', 'WebKit.framework', 'SafariServices.framework'
   s.resources         = "TPDirectResource/Image/*"
   s.frameworks = 'WebKit', 'SafariServices'
 end
