@@ -1,3 +1,9 @@
+## 0.0.50
+
+* upgrade tappay iOS SDK to v2.16.4
+* upgrade tappay Android SDK to 3.9.0
+* clean project
+
 ## 0.0.49
 
 * Support null safety
