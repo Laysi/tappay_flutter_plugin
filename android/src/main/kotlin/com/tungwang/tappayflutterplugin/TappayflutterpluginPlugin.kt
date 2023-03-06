@@ -32,6 +32,7 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
   private var context: Context? = null
   private var activity: Activity? = null
   private var tpdLinePayResultListenerInterface: TPDLinePayResultListenerInterface = TPDLinePayResultListenerInterface()
+  private var tpdJkoPayResultListenerInterface: TPDJkoPayResultListenerInterface = TPDJkoPayResultListenerInterface()
   private val tpdEasyWalletResultListenerInterface: TPDEasyWalletResultListenerInterface = TPDEasyWalletResultListenerInterface()
   private val tpdMerchant = TPDMerchant()
   private val tpdConsumer = TPDConsumer()
@@ -295,6 +296,53 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
         }
       }
 
+      in "isJkoPayAvailable" -> {
+        if (context == null) {
+          result.error(ERROR_CODE_CONTEXT_IS_NULL, "context is null", "")
+        } else {
+          result.success(isJkoPayAvailable())
+        }
+      }
+
+      in "getJkoPayPrime" -> {
+        if (context == null) {
+          result.error(ERROR_CODE_CONTEXT_IS_NULL, "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          getJkoPayPrime(universalLink, prime = {
+            result.success(it)
+          }, failCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "redirectToJkoPay" -> {
+        if (context == null) {
+          result.error(ERROR_CODE_CONTEXT_IS_NULL, "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          val paymentUrl: String? = call.argument("paymentUrl")
+          redirectToJkoPay(universalLink, paymentUrl, callBack = {
+            result.success(it)
+          })
+        }
+      }
+
+      in "parseToJkoPayResult" -> {
+        if (context == null) {
+          result.error(ERROR_CODE_CONTEXT_IS_NULL, "context is null", "")
+        } else {
+          val universalLink: String? = call.argument("universalLink")
+          val uri: String? = call.argument("uri")
+          parseToJkoPayResult(universalLink, uri, failCallBack = {
+            result.success(it)
+          }, successCallBack = {
+            result.success(it)
+          })
+        }
+      }
+
       in "preparePaymentData" -> {
         //取得allowedNetworks
         val allowedNetworks: ArrayList<TPDCard.CardType> = ArrayList()
@@ -459,7 +507,7 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
     }
   }
 
-  //取得line pay result
+  //取得Easywall pay result
   private fun getEasyWalletResult(result: (String) -> (Unit)) {
     if (tpdEasyWalletResultListenerInterface.successResult == null) {
       tpdEasyWalletResultListenerInterface.failResult?.let { result(it) }
@@ -475,7 +523,6 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
 
   //取得line pay prime
   private fun getLinePayPrime(universalLink: String?, prime: (String) -> (Unit), failCallBack: (String) -> (Unit)) {
-
     if (universalLink == null) {
       failCallBack("{\"status\":\"\", \"message\":\"universalLink is null\", \"prime\":\"\"}")
     }else{
@@ -515,6 +562,45 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
       tpdLinePayResultListenerInterface.failResult?.let { result(it) }
     } else {
       tpdLinePayResultListenerInterface.successResult?.let { result(it) }
+    }
+  }
+  // Check Jkopay available
+  private fun isJkoPayAvailable(): Boolean {
+    return TPDJkoPay.isJkoPayAvailable(context)
+  }
+
+  //Get Jkopay prime
+  private fun getJkoPayPrime(universalLink: String?, prime: (String) -> (Unit), failCallBack: (String) -> (Unit)) {
+    if (universalLink == null) {
+      failCallBack("{\"status\":\"\", \"message\":\"universalLink is null\", \"prime\":\"\"}")
+    }else{
+      val linePay = TPDJkoPay(context, universalLink)
+      linePay.getPrime({ tpPrime -> prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"$tpPrime\"}") }, { status, message -> failCallBack("{\"status\":\"$status\", \"message\":\"$message\", \"prime\":\"\"}") })
+    }
+  }
+
+  // redirect to Jko pay
+  private fun redirectToJkoPay(universalLink: String?, paymentUrl: String?, callBack: (String) -> (Unit)) {
+
+    if (universalLink == null || paymentUrl == null) {
+      callBack("{\"status\":\"something is null\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }else{
+      val JkoPay = TPDJkoPay(context, universalLink)
+      JkoPay.redirectWithUrl(paymentUrl)
+      callBack("{\"status\":\"redirect successfully\", \"recTradeId\":\"\", \"orderNumber\":\"\", \"bankTransactionId\":\"\"}")
+    }
+  }
+
+  // parse to Jkopay result
+  private fun parseToJkoPayResult(universalLink: String?, uri: String?, failCallBack: (String) -> (Unit), successCallBack: (String) -> (Unit)) {
+
+    if (universalLink == null || uri == null) {
+      failCallBack("{\"message\":\"universalLink or uri is null\"}")
+    }else{
+      val jkoPay = TPDJkoPay(context, universalLink)
+      val parsedUri = Uri.parse(uri)
+      jkoPay.parseToJkoPayResult(context, parsedUri, this.tpdJkoPayResultListenerInterface)
+      successCallBack("Wait for JkoPay result")
     }
   }
 

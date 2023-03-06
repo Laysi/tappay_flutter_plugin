@@ -87,6 +87,30 @@ class TPDLinePayResult {
     return data;
   }
 }
+class TPDJkoPayResult {
+  String? status;
+  String? recTradeId;
+  String? orderNumber;
+  String? bankTransactionId;
+
+  TPDJkoPayResult(
+      {this.status, this.recTradeId, this.orderNumber, this.bankTransactionId});
+
+  TPDJkoPayResult.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    recTradeId = json['recTradeId'];
+    bankTransactionId = json['bankTransactionId'];
+    orderNumber = json['orderNumber'];
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    data['recTradeId'] = this.recTradeId;
+    data['bankTransactionId'] = this.bankTransactionId;
+    data['orderNumber'] = this.orderNumber;
+    return data;
+  }
+}
 
 class Tappayflutterplugin {
   static const MethodChannel _channel =
@@ -291,6 +315,47 @@ class Tappayflutterplugin {
       print(result);
       return null;
     }
+  }
+
+  // Check JkoPay availability
+  static Future<bool> isJkoPayAvailable() async {
+    var response = await _channel.invokeMethod('isJkoPayAvailable', {});
+    return response;
+  }
+  //Get Jkopay prime
+  static Future<PrimeModel> getJkoPayPrime(
+      {required String universalLink}) async {
+    String response = await _channel.invokeMethod(
+      'getJkoPayPrime',
+      {'universalLink': universalLink},
+    );
+    return PrimeModel.fromJson(json.decode(response));
+  }
+
+  // redirect to Jkopay
+  static Future<TPDJkoPayResult> redirectToJkoPay(
+      {required String universalLink, required String paymentUrl}) async {
+    String result = await _channel.invokeMethod(
+      'redirectToJkoPay',
+      {
+        'universalLink': universalLink,
+        'paymentUrl': paymentUrl,
+      },
+    );
+    return TPDJkoPayResult.fromJson(json.decode(result));
+  }
+
+  // parse to Jkopay result
+  static Future<void> parseToJkoPayResult(
+      {required String universalLink, required String uri}) async {
+    await _channel.invokeMethod(
+      'parseToJkoPayResult',
+      {
+        'universalLink': universalLink,
+        'uri': uri,
+      },
+    );
+    return;
   }
 
   //GooglePay prepare payment data

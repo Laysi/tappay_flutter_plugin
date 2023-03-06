@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tappayflutterplugin_example/direct_pay_screen.dart';
 import 'package:tappayflutterplugin_example/google_pay_screen.dart';
 import 'package:tappayflutterplugin_example/line_pay_screen.dart';
+import 'package:tappayflutterplugin_example/Jko_pay_screen.dart';
 
 class TabScreen extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class _TabScreenState extends State<TabScreen> {
     GooglePayScreen(),
     DirectPayScreen(),
     LinePayScreen(),
+    JkoPayScreen()
+
   ];
   int _currentTabIndex = 0;
 
@@ -34,7 +37,12 @@ class _TabScreenState extends State<TabScreen> {
             icon: Icon(Icons.line_weight),
             label: 'LinePay',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.payments),
+            label: 'JkoPay',
+          )
         ],
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             _currentTabIndex = index;
