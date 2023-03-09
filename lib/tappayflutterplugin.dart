@@ -462,4 +462,63 @@ class Tappayflutterplugin {
       onError(error.message ?? "");
     }
   }
+
+  // Prepare Samsung Pay
+
+  static Future<bool> prepareSamsungPay(
+      {required String merchantName,
+      required List<TPDCardType> allowedNetworks,
+      required String samsungMerchantId,
+      required String currencyCode,
+      required String samsungPayServiceId}) async {
+    List<int> networks = [];
+    for (var i in allowedNetworks) {
+      int value;
+      switch (i) {
+        case TPDCardType.unknown:
+          value = 0;
+          break;
+        case TPDCardType.visa:
+          value = 2;
+          break;
+        case TPDCardType.masterCard:
+          value = 3;
+          break;
+        case TPDCardType.jcb:
+          value = 1;
+          break;
+        case TPDCardType.americanExpress:
+          value = 4;
+          break;
+        case TPDCardType.unionPay:
+          value = 5;
+          break;
+      }
+      networks.add(value);
+    }
+
+    bool isPrepared = false;
+    try {
+      isPrepared = await _channel.invokeMethod(
+        'prepareSamsungPay',
+        {
+          'merchantName': merchantName,
+          'allowedNetworks': networks,
+          'samsungMerchantId': samsungMerchantId,
+          'currencyCode': currencyCode,
+          'samsungPayServiceId': samsungPayServiceId
+        },
+      );
+    } on PlatformException catch (error) {
+      Log.d("PlatformException: ${error.message}, ${error.details}");
+    }
+
+    return isPrepared;
+  }
+
+  // check Samsung Pay available
+  static Future<bool> isSamsungPayAvailable() async {
+    var response = await _channel.invokeMethod('isSamsungPayAvailable', {});
+    return response;
+  }
 }

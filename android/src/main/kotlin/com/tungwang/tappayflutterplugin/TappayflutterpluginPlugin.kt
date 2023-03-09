@@ -34,9 +34,11 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
   private var tpdLinePayResultListenerInterface: TPDLinePayResultListenerInterface = TPDLinePayResultListenerInterface()
   private var tpdJkoPayResultListenerInterface: TPDJkoPayResultListenerInterface = TPDJkoPayResultListenerInterface()
   private val tpdEasyWalletResultListenerInterface: TPDEasyWalletResultListenerInterface = TPDEasyWalletResultListenerInterface()
+  private var tpdSamsungPayListenerInterface: TPDSamsungPayListenerInterface = TPDSamsungPayListenerInterface()
   private val tpdMerchant = TPDMerchant()
   private val tpdConsumer = TPDConsumer()
   private var tpdGooglePay: TPDGooglePay? = null
+  private var tpdSamsungPay: TPDSamsungPay? = null
 
   constructor()
 
@@ -390,6 +392,36 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
       in "getGooglePayPrime" -> {
         getGooglePayPrime()
       }
+      in "prepareSamsungPay" -> {
+
+  // merchantName: String, allowedNetworks: Array<TPDCard.CardType>, samsungMerchantId: String, currencyCode: String="TWD", samsungPayServiceIdSandbox: String
+          val allowedNetworks: ArrayList<TPDCard.CardType> = ArrayList()
+          val cardTypeMap = mapOf(
+              Pair(0, TPDCard.CardType.Unknown),
+              Pair(1, TPDCard.CardType.JCB),
+              Pair(2, TPDCard.CardType.Visa),
+              Pair(3, TPDCard.CardType.MasterCard),
+              Pair(4, TPDCard.CardType.AmericanExpress),
+              Pair(5, TPDCard.CardType.UnionPay)
+          )
+          val networks: List<Int>? = call.argument("allowedNetworks")
+          for (i in networks!!) {
+              val type = cardTypeMap[i]
+              type?.let { allowedNetworks.add(it) }
+          }
+          val merchantName: String? = call.argument("merchantName")
+          val samsungMerchantId: String? = call.argument("merchantName")
+          val currencyCode: String? = call.argument("currencyCode")
+          val samsungPayServiceId: String? = call.argument("samsungPayServiceId")
+          prepareSamsungPay(
+              merchantName,
+              allowedNetworks.toTypedArray(),
+              samsungMerchantId,
+              currencyCode,
+              samsungPayServiceId
+          )
+          this.tpdSamsungPay?.isSamsungPayAvailable(tpdSamsungPayListenerInterface)
+      }
     }
   }
 
@@ -656,4 +688,21 @@ class TappayflutterpluginPlugin: FlutterPlugin, MethodCallHandler, ActivityAware
       methodResult?.error(ERROR_CODE_GET_GOOGLE_PAY_PRIME_FAILED, "Get google pay prime failed", msg)
     })
   }
+
+    //  Prepare Samsung Pay
+    private fun prepareSamsungPay(
+        merchantName: String?,
+        allowedNetworks: Array<TPDCard.CardType>,
+        samsungMerchantId: String?,
+        currencyCode: String?,
+        samsungPayServiceId: String?
+    ) {
+        tpdMerchant.merchantName = merchantName
+        tpdMerchant.supportedNetworks = allowedNetworks
+        tpdMerchant.samsungMerchantId = samsungMerchantId
+        tpdMerchant.currencyCode = currencyCode
+        if (samsungPayServiceId != null) {
+            this.tpdSamsungPay = TPDSamsungPay(this.context!!, samsungPayServiceId, tpdMerchant)
+        }
+    }
 }
