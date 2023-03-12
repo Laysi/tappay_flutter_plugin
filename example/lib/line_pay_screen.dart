@@ -57,8 +57,8 @@ class _LinePayScreenState extends State<LinePayScreen> {
           Container(
             child: TextButton(
               onPressed: () async {
-                var prime = await Tappayflutterplugin.getLinePayPrime();
-                print(prime);
+                var prime = await Tappayflutterplugin.getLinePayPrime(universalLink: 'https://tappay.test');
+                print(prime.toJson());
               },
               child: Text('getLinePayPrime'),
             ),
