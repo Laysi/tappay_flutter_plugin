@@ -342,9 +342,7 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         let JKOPay = TPDJKOPay.setup(withReturnUrl: universalLink)
         
         let paymentUrl = (args["paymentUrl"] as? String ?? "")
-        
-        guard let vc = UIApplication.shared.delegate?.window??.rootViewController else { return }
-        
+                
         JKOPay.redirect(paymentUrl) { (result) in
             callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
         }
