@@ -15,6 +15,7 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [AnyHashable : Any] = [:]) -> Bool {
         TPDLinePay.addExceptionObserver(#selector(tappayLinePayExceptionHandler(notofication:)))
         TPDEasyWallet.addExceptionObserver(#selector(tappayEasyWalletExceptionHandler(notofication:)))
+        TPDJKOPay.addExceptionObserver(#selector(tappayJKOPayExceptionHandler(notofication:)))
         return true
     }
     
@@ -48,6 +49,14 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
     @objc func tappayEasyWalletExceptionHandler(notofication: Notification) {
         
         let result : TPDEasyWalletResult = TPDEasyWallet.parseURL(notofication)
+        
+        print("status : \(result.status) , orderNumber : \(result.orderNumber ?? "") , recTradeid : \(result.recTradeId ?? "") , bankTransactionId : \(result.bankTransactionId ?? "") ")
+        
+    }
+
+    @objc func tappayJKOPayExceptionHandler(notofication: Notification) {
+        
+        let result : TPDJKOPayResult = TPDJKOPay.parseURL(notofication)
         
         print("status : \(result.status) , orderNumber : \(result.orderNumber ?? "") , recTradeid : \(result.recTradeId ?? "") , bankTransactionId : \(result.bankTransactionId ?? "") ")
         
@@ -108,18 +117,18 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
             redirectToLinePay(args: args) { (callBack) in
                 result(callBack)
             }
-            case "isJkoPayAvailable":
-            result(isJkoPayAvailable())
+            case "isJKOPayAvailable":
+            result(isJKOPayAvailable())
             
-        case "getJkoPayPrime":
-            getJkoPayPrime(args: args) { (prime) in
+        case "getJKOPayPrime":
+            getJKOPayPrime(args: args) { (prime) in
                 result(prime)
             } failCallBack: { (message) in
                 result(message)
             }
             
-        case "redirectToJkoPay":
-            redirectToJkoPay(args: args) { (callBack) in
+        case "redirectToJKOPay":
+            redirectToJKOPay(args: args) { (callBack) in
                 result(callBack)
             }
         default:
@@ -294,15 +303,15 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         }
     }
     
-     // Check Jkopay available
-    fileprivate func isJkoPayAvailable() -> Bool {
-        let result = TPDJkoPay.isJkoPayAvailable()
+     // Check JKOpay available
+    fileprivate func isJKOPayAvailable() -> Bool {
+        let result = TPDJKOPay.isJKOPayAvailable()
         return result
     }
     
     
-    // Get Jkopay prime
-    fileprivate func getJkoPayPrime(args: [String:Any], prime: @escaping(String) -> Void, failCallBack: @escaping(String) -> Void) {
+    // Get JKOpay prime
+    fileprivate func getJKOPayPrime(args: [String:Any], prime: @escaping(String) -> Void, failCallBack: @escaping(String) -> Void) {
         
         let universalLink = (args["universalLink"] as? String ?? "")
         
@@ -311,8 +320,8 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        let JkoPay = TPDJkoPay.setup(withReturnUrl: universalLink)
-        JkoPay.onSuccessCallback { (tpPrime) in
+        let JKOPay = TPDJKOPay.setup(withReturnUrl: universalLink)
+        JKOPay.onSuccessCallback { (tpPrime) in
             
             if let tpPrime = tpPrime {
                 prime("{\"status\":\"\", \"message\":\"\", \"prime\":\"\(tpPrime)\"}")
@@ -326,17 +335,17 @@ public class SwiftTappayflutterpluginPlugin: NSObject, FlutterPlugin {
         
     }
     
-    // Redirect to Jkopay
-    fileprivate func redirectToJkoPay(args: [String:Any], callBack: @escaping(String) -> Void) {
+    // Redirect to JKOpay
+    fileprivate func redirectToJKOPay(args: [String:Any], callBack: @escaping(String) -> Void) {
         
         let universalLink = (args["universalLink"] as? String ?? "")
-        let JkoPay = TPDJkoPay.setup(withReturnUrl: universalLink)
+        let JKOPay = TPDJKOPay.setup(withReturnUrl: universalLink)
         
         let paymentUrl = (args["paymentUrl"] as? String ?? "")
         
         guard let vc = UIApplication.shared.delegate?.window??.rootViewController else { return }
         
-        JkoPay.redirect(paymentUrl, with: vc) { (result) in
+        JKOPay.redirect(paymentUrl) { (result) in
             callBack("{\"status\":\"\(String(result.status))\", \"recTradeId\":\"\(String(result.recTradeId))\", \"orderNumber\":\"\(String(result.orderNumber))\", \"bankTransactionId\":\"\(String(result.bankTransactionId))\"}")
         }
     }
