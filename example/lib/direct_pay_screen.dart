@@ -91,10 +91,11 @@ class _DirectPayScreenState extends State<DirectPayScreen> {
                   dueYear: dueYear,
                   ccv: ccv,
                 );
-                if (prime.prime.isEmpty) {
-                  print('status: ${prime.status}, message: ${prime.message}');
-                } else {
+                if (prime.prime != null && prime.prime!.isNotEmpty) {
                   print('prime: ${prime.prime}');
+                } else {
+                  print('status: ${prime.status}, message: ${prime.message}');
+
                 }
               },
               child: Text('Get prime'),

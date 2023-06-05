@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 
@@ -87,6 +88,7 @@ class TPDLinePayResult {
     return data;
   }
 }
+
 class TPDJkoPayResult {
   String? status;
   String? recTradeId;
@@ -184,10 +186,7 @@ class Tappayflutterplugin {
     required String dueYear,
     required String ccv,
   }) async {
-
-    try {
-
-    } on PlatformException catch (error) {
+    try {} on PlatformException catch (error) {
       Log.d("PlatformException: ${error.message}, ${error.details}");
     }
     String response = await _channel.invokeMethod(
@@ -319,9 +318,15 @@ class Tappayflutterplugin {
 
   // Check JkoPay availability
   static Future<bool> isJkoPayAvailable() async {
-    var response = await _channel.invokeMethod('isJkoPayAvailable', {});
-    return response;
+    bool isAvailable = false;
+    try {
+      isAvailable = await _channel.invokeMethod('isJkoPayAvailable', {});
+    } catch (e) {
+      return isAvailable;
+    }
+    return isAvailable;
   }
+
   //Get Jkopay prime
   static Future<PrimeModel> getJkoPayPrime(
       {required String universalLink}) async {
@@ -329,6 +334,7 @@ class Tappayflutterplugin {
       'getJkoPayPrime',
       {'universalLink': universalLink},
     );
+    // print(response);
     return PrimeModel.fromJson(json.decode(response));
   }
 
@@ -409,7 +415,7 @@ class Tappayflutterplugin {
 
     bool isPrepared = false;
     try {
-      isPrepared = await _channel.invokeMethod(
+      await _channel.invokeMethod(
         'preparePaymentData',
         {
           'allowedNetworks': networks,
@@ -420,10 +426,10 @@ class Tappayflutterplugin {
           'isEmailRequired': isEmailRequired,
         },
       );
+      isPrepared = true;
     } on PlatformException catch (error) {
       Log.d("PlatformException: ${error.message}, ${error.details}");
     }
-
     return isPrepared;
   }
 

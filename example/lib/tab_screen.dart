@@ -15,7 +15,6 @@ class _TabScreenState extends State<TabScreen> {
     DirectPayScreen(),
     LinePayScreen(),
     JkoPayScreen()
-
   ];
   int _currentTabIndex = 0;
 
@@ -40,7 +39,11 @@ class _TabScreenState extends State<TabScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.payments),
             label: 'JkoPay',
-          )
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.apple),
+            label: 'ApplePay',
+            ),
         ],
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
